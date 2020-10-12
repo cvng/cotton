@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Adapter } from "../adapters/adapter.ts";
 import { Colors, joinPath } from "../../deps.ts";
 import { Schema } from "./schema.ts";
@@ -30,7 +31,7 @@ export class MigrationRunner {
 
   /**
    * Create a new migration script
-   * 
+   *
    * @param name the name of the migration
    */
   public async createMigrationFile(name: string): Promise<string> {
@@ -162,7 +163,7 @@ export class MigrationRunner {
 
   /**
    * Revert executed migrations from the last batch
-   * 
+   *
    * @param steps the number of migrations you want to revert
    */
   public async revertMigrations(steps?: number) {

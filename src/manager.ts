@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   isSaved,
   compareWithOriginal,
@@ -45,14 +46,14 @@ export type FindOptions<T> = FindOneOptions<T> & {
 export class Manager {
   /**
    * Create a model manager.
-   * 
+   *
    * @param adapter the database adapter to perform queries
    */
   constructor(private adapter: Adapter) {}
 
   /**
    * Query a model.
-   * 
+   *
    * @param modelClass the model you want to query
    */
   public query<T extends Object>(modelClass: { new (): T }): ModelQuery<T> {
@@ -114,21 +115,21 @@ export class Manager {
 
   /**
    * Remove given model instance from the database.
-   * 
+   *
    * @param model the model you want to remove.
    */
   public async remove<T extends Object>(model: T): Promise<T>;
 
   /**
    * Remove given model instaces from the database.
-   * 
+   *
    * @param model the model you want to remove.
    */
   public async remove<T extends Object>(model: T[]): Promise<T[]>;
 
   /**
    * Remove given model from the database.
-   * 
+   *
    * @param model the model you want to remove.
    */
   public async remove<T extends Object>(model: T | T[]): Promise<T | T[]> {
@@ -195,7 +196,7 @@ export class Manager {
 
   /**
    * Perform update to a model.
-   * 
+   *
    * @param model the model you want to update.
    */
   private async update<T extends Object>(model: T): Promise<T> {

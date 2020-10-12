@@ -125,7 +125,7 @@ export interface QueryDescription {
 /**
  * Allows to build complex SQL queries and execute those queries.
  */
-export class QueryBuilder {
+export class QueryBuilder<T extends {} = DatabaseResult> {
   private description: QueryDescription;
 
   // --------------------------------------------------------------------------------
@@ -159,25 +159,25 @@ export class QueryBuilder {
 
   /**
    * Add basic WHERE clause to query
-   * 
+   *
    * @param column the table column name
    * @param value the expected value
    */
-  public where(column: string, value: DatabaseValues): QueryBuilder;
+  public where(column: string, value: DatabaseValues): QueryBuilder<T>;
 
   /**
    * Add basic WHERE clause to query with custom query expression.
-   * 
+   *
    * @param column the table column name
    * @param expresion a custom SQL expression to filter the records
    */
-  public where(column: string, expression: QueryExpression): QueryBuilder;
+  public where(column: string, expression: QueryExpression): QueryBuilder<T>;
 
   /** Add basic WHERE clause to query */
   public where(
     column: string,
     expression: DatabaseValues | QueryExpression,
-  ): QueryBuilder {
+  ): QueryBuilder<T> {
     this.description.wheres.push({
       column,
       expression: expression instanceof QueryExpression
@@ -191,25 +191,25 @@ export class QueryBuilder {
 
   /**
    * Add WHERE NOT clause to query
-   * 
+   *
    * @param column the table column name
    * @param value the expected value
    */
-  public not(column: string, value: DatabaseValues): QueryBuilder;
+  public not(column: string, value: DatabaseValues): QueryBuilder<T>;
 
   /**
    * Add WHERE NOT clause to query with custom query expression.
-   * 
+   *
    * @param column the table column name
    * @param expresion a custom SQL expression to filter the records
    */
-  public not(column: string, expression: QueryExpression): QueryBuilder;
+  public not(column: string, expression: QueryExpression): QueryBuilder<T>;
 
   /** Add WHERE NOT clause to query */
   public not(
     column: string,
     expression: DatabaseValues | QueryExpression,
-  ): QueryBuilder {
+  ): QueryBuilder<T> {
     this.description.wheres.push({
       column,
       expression: expression instanceof QueryExpression
@@ -223,25 +223,25 @@ export class QueryBuilder {
 
   /**
    * Add WHERE ... OR clause to query
-   * 
+   *
    * @param column the table column name
    * @param value the expected value
    */
-  public or(column: string, value: DatabaseValues): QueryBuilder;
+  public or(column: string, value: DatabaseValues): QueryBuilder<T>;
 
   /**
    * Add WHERE ... OR clause to query with custom query expression.
-   * 
+   *
    * @param column the table column name
    * @param expresion a custom SQL expression to filter the records
    */
-  public or(column: string, expression: QueryExpression): QueryBuilder;
+  public or(column: string, expression: QueryExpression): QueryBuilder<T>;
 
   /** Add WHERE ... OR clause to query */
   public or(
     column: string,
     expression: DatabaseValues | QueryExpression,
-  ): QueryBuilder {
+  ): QueryBuilder<T> {
     this.description.wheres.push({
       column,
       expression: expression instanceof QueryExpression
@@ -255,20 +255,20 @@ export class QueryBuilder {
 
   /**
    * Select table columns
-   * 
+   *
    * @param columns table columns to select
    */
-  public select(...columns: (string | [string, string])[]): QueryBuilder {
+  public select(...columns: (string | [string, string])[]): QueryBuilder<T> {
     this.description.columns = this.description.columns.concat(columns);
     return this;
   }
 
   /**
    * Set the "limit" value for the query.
-   * 
+   *
    * @param limit Maximum number of records
    */
-  public limit(limit: number): QueryBuilder {
+  public limit(limit: number): QueryBuilder<T> {
     if (limit >= 0) {
       this.description.limit = limit;
     }
@@ -278,10 +278,10 @@ export class QueryBuilder {
 
   /**
    * Set the "offset" value for the query.
-   * 
+   *
    * @param offset Numbers of records to skip
    */
-  public offset(offset: number): QueryBuilder {
+  public offset(offset: number): QueryBuilder<T> {
     if (offset > 0) {
       this.description.offset = offset;
     }
@@ -292,45 +292,45 @@ export class QueryBuilder {
   /**
    * Get the first record of the query, shortcut for `limit(1)`
    */
-  public first(): QueryBuilder {
+  public first(): QueryBuilder<T> {
     return this.limit(1);
   }
 
   /**
    * Add an "order by" clause to the query.
-   * 
+   *
    * @param column Table field
    * @param direction "ASC" or "DESC"
    */
   public order(
     column: string,
     direction: OrderDirection = "ASC",
-  ): QueryBuilder {
+  ): QueryBuilder<T> {
     this.description.orders.push({ column, order: direction });
     return this;
   }
 
   /**
    * Add SQL HAVING clause to query
-   * 
+   *
    * @param column the table column name
    * @param value the expected value
    */
-  public having(column: string, value: DatabaseValues): QueryBuilder;
+  public having(column: string, value: DatabaseValues): QueryBuilder<T>;
 
   /**
    * Add SQL HAVING clause to query with custom query expression.
-   * 
+   *
    * @param column the table column name
    * @param expresion a custom SQL expression to filter the records
    */
-  public having(column: string, expression: QueryExpression): QueryBuilder;
+  public having(column: string, expression: QueryExpression): QueryBuilder<T>;
 
   /** Add SQL HAVING clause to query */
   public having(
     column: string,
     expression: DatabaseValues | QueryExpression,
-  ): QueryBuilder {
+  ): QueryBuilder<T> {
     this.description.havings.push({
       column,
       expression: expression instanceof QueryExpression
@@ -354,10 +354,10 @@ export class QueryBuilder {
 
   /**
    * Sets the returning value for the query.
-   * 
+   *
    * @param columns Table column name
    */
-  public returning(...columns: string[]): QueryBuilder {
+  public returning(...columns: string[]): QueryBuilder<T> {
     this.description.returning = this.description.returning.concat(columns);
     return this;
   }
@@ -368,10 +368,10 @@ export class QueryBuilder {
 
   /**
    * Insert a record to the table
-   * 
+   *
    * @param data A JSON Object representing columnname-value pairs. Example: { firstname: "John", age: 22, ... }
    */
-  public insert(data: QueryValues | QueryValues[]): QueryBuilder {
+  public insert(data: QueryValues | QueryValues[]): QueryBuilder<T> {
     // Change the query type from `select` (default) to `insert`
     this.description.type = QueryType.Insert;
 
@@ -383,14 +383,14 @@ export class QueryBuilder {
 
   /**
    * Perform `REPLACE` query to the table.
-   * 
+   *
    * It will look for `PRIMARY` and `UNIQUE` constraints.
    * If something matched, it gets removed from the table
    * and creates a new row with the given values.
-   * 
+   *
    * @param data A JSON Object representing columnname-value pairs. Example: { firstname: "John", age: 22, ... }
    */
-  public replace(data: QueryValues): QueryBuilder {
+  public replace(data: QueryValues): QueryBuilder<T> {
     // Change the query type from `select` (default) to `replace`
     this.description.type = QueryType.Replace;
 
@@ -402,10 +402,10 @@ export class QueryBuilder {
 
   /**
    * Update record on the database
-   * 
+   *
    * @param data A JSON Object representing columnname-value pairs. Example: { firstname: "John", age: 22, ... }
    */
-  public update(data: QueryValues): QueryBuilder {
+  public update(data: QueryValues): QueryBuilder<T> {
     // Change the query type from `select` (default) to `update`
     this.description.type = QueryType.Update;
 
@@ -418,7 +418,7 @@ export class QueryBuilder {
   /**
    * Delete record from the database.
    */
-  public delete(): QueryBuilder {
+  public delete(): QueryBuilder<T> {
     this.description.type = QueryType.Delete;
     return this;
   }
@@ -429,11 +429,11 @@ export class QueryBuilder {
 
   /**
    * Count records with given conditions
-   * 
+   *
    * @param column the column(s) you want to count
    * @param as the alias for the count result
    */
-  public count(column: string | string[], as?: string): QueryBuilder {
+  public count(column: string | string[], as?: string): QueryBuilder<T> {
     // Initialize the count information
     const info: CountBinding = {
       columns: Array.isArray(column) ? column : [column],
@@ -451,11 +451,14 @@ export class QueryBuilder {
 
   /**
    * Count records with unique values
-   * 
+   *
    * @param columns the unique column(s) you want to count
    * @param as the alias for the count result
    */
-  public countDistinct(column: string | string[], as?: string): QueryBuilder {
+  public countDistinct(
+    column: string | string[],
+    as?: string,
+  ): QueryBuilder<T> {
     // Initialize the count information
     const info: CountBinding = {
       columns: Array.isArray(column) ? column : [column],
@@ -474,7 +477,7 @@ export class QueryBuilder {
   /**
    * Force the query to return distinct (unique) results.
    */
-  public distinct(): QueryBuilder {
+  public distinct(): QueryBuilder<T> {
     this.description.isDistinct = true;
     return this;
   }
@@ -484,7 +487,7 @@ export class QueryBuilder {
   // --------------------------------------------------------------------------------
 
   /** SQL INNER JOIN */
-  public innerJoin(table: string, a: string, b: string): QueryBuilder {
+  public innerJoin(table: string, a: string, b: string): QueryBuilder<T> {
     this.description.joins.push({
       type: JoinType.Inner,
       table,
@@ -496,7 +499,7 @@ export class QueryBuilder {
   }
 
   /** SQL FULL OUTER JOIN */
-  public fullJoin(table: string, a: string, b: string): QueryBuilder {
+  public fullJoin(table: string, a: string, b: string): QueryBuilder<T> {
     this.description.joins.push({
       type: JoinType.Full,
       table,
@@ -508,7 +511,7 @@ export class QueryBuilder {
   }
 
   /** SQL LEFT OUTER JOIN */
-  public leftJoin(table: string, a: string, b: string): QueryBuilder {
+  public leftJoin(table: string, a: string, b: string): QueryBuilder<T> {
     this.description.joins.push({
       type: JoinType.Left,
       table,
@@ -520,7 +523,7 @@ export class QueryBuilder {
   }
 
   /** SQL RIGHT OUTER JOIN */
-  public rightJoin(table: string, a: string, b: string): QueryBuilder {
+  public rightJoin(table: string, a: string, b: string): QueryBuilder<T> {
     this.description.joins.push({
       type: JoinType.Right,
       table,
@@ -537,10 +540,10 @@ export class QueryBuilder {
 
   /**
    * Execute query and get the result
-   * 
+   *
    * @param adapter Custom database adapter
    */
-  public async execute(adapter?: Adapter): Promise<DatabaseResult[]> {
+  public async execute(adapter?: Adapter): Promise<T[]> {
     let currentAdapter = adapter || this.adapter;
 
     if (!currentAdapter) {
@@ -548,7 +551,7 @@ export class QueryBuilder {
     }
 
     const { text, values } = this.toSQL();
-    return currentAdapter.query(text, values);
+    return currentAdapter.query(text, values) as unknown as T[];
   }
 
   /**

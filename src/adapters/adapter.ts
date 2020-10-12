@@ -60,8 +60,8 @@ export abstract class Adapter {
    *
    * @param tableName The table name which the query is targetting
    */
-  public table(tableName: string): QueryBuilder {
-    return new QueryBuilder(tableName, this);
+  public table<T>(tableName: string): QueryBuilder<T> {
+    return new QueryBuilder<T>(tableName, this);
   }
 
   /**

@@ -1,5 +1,5 @@
 import { QueryBuilder } from "../querybuilder.ts";
-import { DatabaseDialect } from "../connect.ts";
+import type { DatabaseDialect } from "../connect.ts";
 import { Manager } from "../manager.ts";
 
 /**
@@ -60,8 +60,8 @@ export abstract class Adapter {
    *
    * @param tableName The table name which the query is targetting
    */
-  public table(tableName: string): QueryBuilder {
-    return new QueryBuilder(tableName, this);
+  public table<T>(tableName: string): QueryBuilder<T> {
+    return new QueryBuilder<T>(tableName, this);
   }
 
   /**
